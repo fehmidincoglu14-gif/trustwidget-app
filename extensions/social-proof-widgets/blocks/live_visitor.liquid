@@ -1,0 +1,98 @@
+<div class="tw-visitor-counter" style="background-color: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }};">
+  <span class="tw-pulse" style="background-color: {{ block.settings.pulse_color }};"></span>
+  <span class="tw-visitor-text">
+    <strong><span id="tw-visitor-count">{{ block.settings.default_count }}</span></strong> {{ 'widget.live_visitor.text' | t }}
+  </span>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const counterEl = document.getElementById('tw-visitor-count');
+    if(!counterEl) return;
+    
+    const proxyUrl = '/apps/tw-api?action=live-visitor';
+    
+    // Initial fetch
+    fetchVisitorData();
+    
+    // Poll every 15 seconds
+    setInterval(fetchVisitorData, 15000);
+    
+    function fetchVisitorData() {
+      fetch(proxyUrl)
+        .then(res => res.json())
+        .then(result => {
+          if (result.success && result.data && result.data.count) {
+             counterEl.innerText = result.data.count;
+          }
+        })
+        .catch(err => console.error('TrustWidget: Error fetching visitor data', err));
+    }
+  });
+</script>
+
+<style>
+  .tw-visitor-counter {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: rgba(0,0,0,0.05);
+    font-size: 14px;
+    margin: 10px 0;
+  }
+  .tw-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: tw-pulse-anim 2s infinite;
+  }
+  @keyframes tw-pulse-anim {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 6px rgba(255, 82, 82, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Live Visitor Counter",
+  "target": "section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "pulse_color",
+      "label": "Pulse Dot Color",
+      "default": "#ff5252"
+    },
+    {
+      "type": "text",
+      "id": "visitor_text",
+      "label": "Visitor Text",
+      "default": "people are viewing this product right now."
+    },
+    {
+      "type": "number",
+      "id": "default_count",
+      "label": "Starting Visitor Count",
+      "default": 12
+    }
+  ]
+}
+{% endschema %}

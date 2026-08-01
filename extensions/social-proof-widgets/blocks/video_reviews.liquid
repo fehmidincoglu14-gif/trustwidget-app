@@ -1,0 +1,178 @@
+<div class="tw-video-reviews" style="bottom: {{ block.settings.bottom_offset }}px;">
+  <div class="tw-vr-bubble" onclick="document.getElementById('tw-vr-modal-{{ block.id }}').style.display='flex'">
+    {% if block.settings.video_thumbnail %}
+      <img src="{{ block.settings.video_thumbnail | image_url: width: 100 }}" alt="Video Review" class="tw-vr-thumb" width="100" height="100">
+    {% else %}
+      <div class="tw-vr-thumb tw-vr-fallback">▶</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Modal for full screen video -->
+<div id="tw-vr-modal-{{ block.id }}" class="tw-vr-modal" style="display: none;">
+  <div class="tw-vr-modal-content">
+    <button class="tw-vr-close" onclick="document.getElementById('tw-vr-modal-{{ block.id }}').style.display='none'">&times;</button>
+    <div class="tw-vr-video-wrapper">
+      {% if block.settings.video_url %}
+        <video controls autoplay muted loop>
+          <source src="{{ block.settings.video_url }}" type="video/mp4">
+          Your browser does not support HTML video.
+        </video>
+      {% else %}
+        <div class="tw-vr-placeholder">Please add a Video URL in the Theme Editor</div>
+      {% endif %}
+    </div>
+    <div class="tw-vr-details">
+      <div class="tw-vr-stars">⭐⭐⭐⭐⭐</div>
+      <p class="tw-vr-product-name">{{ product.title }}</p>
+      <a href="{{ product.url }}" class="tw-vr-btn">Bunu İstiyorum</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .tw-video-reviews {
+    position: fixed;
+    right: 20px;
+    z-index: 9998;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tw-vr-bubble {
+    width: 60px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+    border: 2px solid white;
+    transition: transform 0.2s;
+  }
+  .tw-vr-bubble:hover {
+    transform: scale(1.05);
+  }
+  .tw-vr-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .tw-vr-fallback {
+    background-color: #333;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  
+  /* Modal Styles */
+  .tw-vr-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tw-vr-modal-content {
+    background-color: #000;
+    width: 100%;
+    max-width: 400px;
+    height: 80vh;
+    border-radius: 12px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .tw-vr-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255,255,255,0.3);
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 10;
+  }
+  .tw-vr-video-wrapper {
+    flex-grow: 1;
+    position: relative;
+  }
+  .tw-vr-video-wrapper video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .tw-vr-placeholder {
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 20px;
+  }
+  .tw-vr-details {
+    padding: 20px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    color: white;
+    font-family: inherit;
+  }
+  .tw-vr-stars {
+    margin-bottom: 5px;
+  }
+  .tw-vr-product-name {
+    font-weight: bold;
+    margin: 0 0 15px 0;
+  }
+  .tw-vr-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #FF4500;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Video Review Bubble",
+  "target": "body",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "video_thumbnail",
+      "label": "Thumbnail Image"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "Video URL (MP4)",
+      "info": "Upload your video to Shopify Files and paste the link here."
+    },
+    {
+      "type": "number",
+      "id": "bottom_offset",
+      "label": "Bottom Offset (px)",
+      "default": 100
+    }
+  ]
+}
+{% endschema %}

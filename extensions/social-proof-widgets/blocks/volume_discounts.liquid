@@ -1,0 +1,86 @@
+{% schema %}
+{
+  "name": "Volume Discounts",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Buy More, Save More"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f8f8f8"
+    }
+  ]
+}
+{% endschema %}
+
+<div class="tw-volume-discount" style="background: {{ block.settings.bg_color }};">
+  <h3 class="tw-vd-title">{{ block.settings.title }}</h3>
+  <div class="tw-vd-options">
+    <div class="tw-vd-option" onclick="twAddMultiple(1)">
+      <div class="tw-vd-radio"></div>
+      <div class="tw-vd-text">Buy 1 <span class="tw-vd-badge">Standard</span></div>
+    </div>
+    <div class="tw-vd-option tw-vd-popular" onclick="twAddMultiple(2)">
+      <div class="tw-vd-radio"></div>
+      <div class="tw-vd-text">Buy 2 <span class="tw-vd-badge">Save 10%</span></div>
+    </div>
+    <div class="tw-vd-option" onclick="twAddMultiple(3)">
+      <div class="tw-vd-radio"></div>
+      <div class="tw-vd-text">Buy 3 <span class="tw-vd-badge">Save 20%</span></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .tw-volume-discount {
+    padding: 15px; border-radius: 8px; margin: 20px 0; font-family: inherit;
+    border: 1px solid #eaeaea;
+  }
+  .tw-vd-title { margin-top: 0; margin-bottom: 15px; font-size: 16px; font-weight: 600; }
+  .tw-vd-option {
+    display: flex; align-items: center; padding: 10px; border: 1px solid #ccc;
+    border-radius: 6px; margin-bottom: 8px; cursor: pointer; transition: 0.2s;
+    background: #fff;
+  }
+  .tw-vd-option:hover, .tw-vd-popular { border-color: #000; }
+  .tw-vd-popular { background: #fdfdfd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+  .tw-vd-radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #ccc; margin-right: 12px; }
+  .tw-vd-popular .tw-vd-radio { border-color: #000; background: #000; }
+  .tw-vd-text { flex: 1; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
+  .tw-vd-badge { background: #ffeded; color: #d00000; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+</style>
+
+<script>
+  function twAddMultiple(qty) {
+    const variantId = document.querySelector('[name="id"]')?.value;
+    if (!variantId) {
+      alert("Please select a valid variant first.");
+      return;
+    }
+    
+    let formData = {
+      'items': [{
+        'id': variantId,
+        'quantity': qty
+      }]
+    };
+
+    fetch(window.Shopify.routes.root + 'cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    })
+    .then(response => {
+      window.location.href = '/cart'; // redirect to cart
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
+</script>

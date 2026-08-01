@@ -1,0 +1,127 @@
+{% schema %}
+{
+  "name": "Wheel of Fortune",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Popup Title",
+      "default": "Spin to Win!"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Enter your email for a chance to win up to 50% OFF."
+    }
+  ]
+}
+{% endschema %}
+
+<div id="tw-wheel-modal" class="tw-wheel-modal" style="display: none;">
+  <div class="tw-wheel-content">
+    <span class="tw-wheel-close" onclick="document.getElementById('tw-wheel-modal').style.display='none'">&times;</span>
+    <div class="tw-wheel-split">
+      <div class="tw-wheel-left">
+        <div class="tw-wheel-spinner">
+          <div class="tw-wheel-pointer">▼</div>
+          <div id="tw-wheel-circle" class="tw-wheel-circle">
+            <!-- Simulated wheel slices via CSS conic-gradient -->
+          </div>
+        </div>
+      </div>
+      <div class="tw-wheel-right">
+        <h2>{{ block.settings.title }}</h2>
+        <p>{{ block.settings.subtitle }}</p>
+        
+        {% form 'customer', id: 'tw-wheel-form' %}
+          <input type="hidden" name="contact[tags]" value="prospect, newsletter, wheel-of-fortune">
+          <input type="email" name="contact[email]" required placeholder="Email Address" class="tw-wheel-input">
+          <button type="button" class="tw-wheel-btn" onclick="twSpinWheel()">Try Your Luck</button>
+          
+          <div id="tw-wheel-result" style="display:none; margin-top:15px; font-weight:bold; color:#d00000;">
+            You won 20% OFF! Use code: LUCKY20
+          </div>
+        {% endform %}
+        
+        <p class="tw-wheel-decline" onclick="document.getElementById('tw-wheel-modal').style.display='none'">No thanks, I prefer paying full price</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .tw-wheel-modal {
+    position: fixed; z-index: 99999; left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+    font-family: inherit;
+  }
+  .tw-wheel-content {
+    background: #fff; width: 90%; max-width: 800px; border-radius: 12px; position: relative;
+    overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  .tw-wheel-close {
+    position: absolute; right: 15px; top: 10px; font-size: 28px; color: #999; cursor: pointer; z-index: 10;
+  }
+  .tw-wheel-split { display: flex; flex-wrap: wrap; }
+  .tw-wheel-left {
+    flex: 1; min-width: 300px; background: #f8f8f8; display: flex; align-items: center; justify-content: center;
+    padding: 40px;
+  }
+  .tw-wheel-right {
+    flex: 1; min-width: 300px; padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center;
+  }
+  .tw-wheel-spinner { position: relative; width: 250px; height: 250px; }
+  .tw-wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 30px; color: #333; z-index: 5; }
+  .tw-wheel-circle {
+    width: 100%; height: 100%; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    background: conic-gradient(#ff9a9e 0deg 60deg, #fecfef 60deg 120deg, #a1c4fd 120deg 180deg, #c2e9fb 180deg 240deg, #d4fc79 240deg 300deg, #96e6a1 300deg 360deg);
+    transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  .tw-wheel-right h2 { margin-top: 0; font-size: 28px; }
+  .tw-wheel-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+  .tw-wheel-btn { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: 4px; font-weight: bold; font-size: 16px; cursor: pointer; }
+  .tw-wheel-decline { margin-top: 20px; font-size: 12px; color: #888; text-decoration: underline; cursor: pointer; }
+</style>
+
+<script>
+  function twSpinWheel() {
+    const input = document.querySelector('.tw-wheel-input');
+    if (!input.value || !input.validity.valid) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+    
+    const circle = document.getElementById('tw-wheel-circle');
+    const btn = document.querySelector('.tw-wheel-btn');
+    
+    // Spin animation
+    const randomDegree = 1800 + Math.floor(Math.random() * 360); // 5+ spins
+    circle.style.transform = `rotate(${randomDegree}deg)`;
+    btn.disabled = true;
+    
+    setTimeout(() => {
+      document.getElementById('tw-wheel-result').style.display = 'block';
+      // Automatically submit form after showing code, or just submit it in background
+      const form = document.getElementById('tw-wheel-form');
+      // For MVP: We just simulate success to avoid redirecting user
+      fetch(form.action, {
+        method: form.method,
+        body: new FormData(form),
+        headers: { 'Accept': 'application/javascript' } // Try to keep them on page
+      }).catch(e => console.log('Form sub'));
+      
+    }, 3200);
+  }
+
+  // Trigger popup after 5 seconds if not seen
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!sessionStorage.getItem('tw_wheel_seen')) {
+      setTimeout(() => {
+        document.getElementById('tw-wheel-modal').style.display = 'flex';
+        sessionStorage.setItem('tw_wheel_seen', 'true');
+      }, 5000);
+    }
+  });
+</script>

@@ -1,0 +1,106 @@
+<div class="tw-recent-sales-widget" style="background-color: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }};">
+  <div class="tw-content">
+    {% if block.settings.show_image %}
+      <div class="tw-product-img-fallback" style="width:50px;height:50px;background:#ddd;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:12px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      </div>
+    {% endif %}
+    <div class="tw-text-container">
+      <p class="tw-title"><strong>Ahmet</strong> from <strong>Istanbul</strong></p>
+      <p class="tw-subtitle">Just purchased a T-Shirt</p>
+      <p class="tw-time">2 hours ago</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .tw-recent-sales-widget {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    font-family: inherit;
+    max-width: 300px;
+  }
+  .tw-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .tw-product-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+  .tw-text-container p {
+    margin: 0;
+    line-height: 1.3;
+  }
+  .tw-title {
+    font-size: 14px;
+  }
+  .tw-subtitle {
+    font-size: 13px;
+    opacity: 0.9;
+  }
+  .tw-time {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-top: 4px;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Recent Sales Pop",
+  "target": "body",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "Show Product Image",
+      "default": true
+    }
+  ]
+}
+{% endschema %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // The prefix and subpath configured in shopify.app.toml
+    const proxyUrl = '/apps/tw-api?action=recent-sales';
+    
+    fetch(proxyUrl)
+      .then(res => res.json())
+      .then(result => {
+        if (result.success && result.data) {
+          const titleEl = document.querySelector('.tw-recent-sales-widget .tw-title');
+          const timeEl = document.querySelector('.tw-recent-sales-widget .tw-time');
+          const subEl = document.querySelector('.tw-recent-sales-widget .tw-subtitle');
+          
+          if (titleEl) titleEl.innerHTML = `<strong>${result.data.firstName}</strong> from <strong>${result.data.city}</strong>`;
+          if (timeEl) timeEl.innerText = result.data.timeAgo;
+          if (subEl) subEl.innerText = `Just purchased a ${result.data.productName}`;
+        }
+      })
+      .catch(err => console.error('TrustWidget: Error fetching recent sales data', err));
+  });
+</script>

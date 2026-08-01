@@ -1,0 +1,104 @@
+<div class="tw-countdown" style="background-color: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }};">
+  <span class="tw-countdown-text">{{ block.settings.timer_text }}</span>
+  <div class="tw-countdown-clock" id="tw-timer-{{ block.id }}">
+    <span class="tw-time-unit"><span class="tw-hours">00</span><small>h</small></span>:
+    <span class="tw-time-unit"><span class="tw-minutes">00</span><small>m</small></span>:
+    <span class="tw-time-unit"><span class="tw-seconds">00</span><small>s</small></span>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const timerId = 'tw-timer-{{ block.id }}';
+    const container = document.getElementById(timerId);
+    if (!container) return;
+    
+    // In a real scenario, the end time would be fetched from settings or backend.
+    // For this widget, we create a fake urgency timer (e.g. 2 hours from now).
+    let duration = {{ block.settings.minutes }} * 60; // in seconds
+    
+    const hEl = container.querySelector('.tw-hours');
+    const mEl = container.querySelector('.tw-minutes');
+    const sEl = container.querySelector('.tw-seconds');
+
+    const updateTimer = () => {
+      if (duration <= 0) return;
+      duration--;
+      
+      const h = Math.floor(duration / 3600);
+      const m = Math.floor((duration % 3600) / 60);
+      const s = Math.floor(duration % 60);
+      
+      if(hEl) hEl.innerText = h.toString().padStart(2, '0');
+      if(mEl) mEl.innerText = m.toString().padStart(2, '0');
+      if(sEl) sEl.innerText = s.toString().padStart(2, '0');
+    };
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+  });
+</script>
+
+<style>
+  .tw-countdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    margin: 10px 0;
+    font-family: inherit;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  }
+  .tw-countdown-clock {
+    display: flex;
+    align-items: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .tw-time-unit {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    margin: 0 4px;
+  }
+  .tw-time-unit small {
+    font-size: 10px;
+    font-weight: normal;
+    opacity: 0.8;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Countdown Timer",
+  "target": "section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#212121"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "timer_text",
+      "label": "Timer Text",
+      "default": "Sale ends in:"
+    },
+    {
+      "type": "number",
+      "id": "minutes",
+      "label": "Duration (minutes)",
+      "default": 120
+    }
+  ]
+}
+{% endschema %}

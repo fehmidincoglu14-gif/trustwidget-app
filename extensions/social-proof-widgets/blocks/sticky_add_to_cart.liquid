@@ -1,0 +1,108 @@
+{% schema %}
+{
+  "name": "Sticky Add to Cart",
+  "target": "section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_color",
+      "label": "Button Color",
+      "default": "#000000"
+    }
+  ]
+}
+{% endschema %}
+
+{% if product %}
+<div id="tw-sticky-cart" class="tw-sticky-cart" style="background: {{ block.settings.bg_color }}; display: none;">
+  <div class="tw-sticky-container">
+    <div class="tw-sticky-product">
+      <img src="{{ product.featured_image | image_url: width: 50 }}" alt="{{ product.title }}">
+      <div class="tw-sticky-info">
+        <span class="tw-sticky-title">{{ product.title }}</span>
+        <span class="tw-sticky-price">{{ product.price | money }}</span>
+      </div>
+    </div>
+    <div class="tw-sticky-action">
+      <button class="tw-sticky-btn" style="background: {{ block.settings.btn_color }};" onclick="twStickyAddToCart()">
+        Add to Cart
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .tw-sticky-cart {
+    position: fixed; bottom: 0; left: 0; width: 100%; z-index: 99990;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1); border-top: 1px solid #eaeaea;
+    transform: translateY(100%); transition: transform 0.3s ease-out; font-family: inherit;
+  }
+  .tw-sticky-cart.tw-visible {
+    display: block !important; transform: translateY(0);
+  }
+  .tw-sticky-container {
+    max-width: 1200px; margin: 0 auto; padding: 10px 20px; display: flex;
+    justify-content: space-between; align-items: center;
+  }
+  .tw-sticky-product { display: flex; align-items: center; gap: 15px; }
+  .tw-sticky-product img { border-radius: 4px; }
+  .tw-sticky-info { display: flex; flex-direction: column; }
+  .tw-sticky-title { font-weight: 600; font-size: 14px; }
+  .tw-sticky-price { font-size: 14px; color: #555; }
+  .tw-sticky-btn {
+    color: #fff; padding: 12px 24px; border: none; border-radius: 4px;
+    font-weight: bold; font-size: 14px; cursor: pointer; transition: opacity 0.2s;
+  }
+  .tw-sticky-btn:hover { opacity: 0.9; }
+</style>
+
+<script>
+  function twStickyAddToCart() {
+    const variantId = document.querySelector('[name="id"]')?.value;
+    if (!variantId) {
+      alert("Please select a variant.");
+      return;
+    }
+    
+    let formData = {
+      'items': [{
+        'id': variantId,
+        'quantity': 1
+      }]
+    };
+
+    const btn = document.querySelector('.tw-sticky-btn');
+    btn.innerText = "Adding...";
+
+    fetch(window.Shopify.routes.root + 'cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    })
+    .then(response => {
+      window.location.href = '/cart';
+    })
+    .catch((error) => {
+      btn.innerText = "Error";
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const stickyCart = document.getElementById('tw-sticky-cart');
+    // Show sticky cart when scrolled past 500px
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 500) {
+        stickyCart.classList.add('tw-visible');
+      } else {
+        stickyCart.classList.remove('tw-visible');
+      }
+    });
+  });
+</script>
+{% endif %}

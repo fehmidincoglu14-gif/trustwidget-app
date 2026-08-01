@@ -1,0 +1,105 @@
+{% schema %}
+{
+  "name": "Product Bundles",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Frequently Bought Together"
+    },
+    {
+      "type": "product",
+      "id": "bundle_product",
+      "label": "Product to Bundle"
+    }
+  ]
+}
+{% endschema %}
+
+{% if block.settings.bundle_product %}
+  {% assign bundled = all_products[block.settings.bundle_product] %}
+  {% if bundled != blank %}
+    <div class="tw-bundle-widget">
+      <h3 class="tw-bundle-title">{{ block.settings.title }}</h3>
+      <div class="tw-bundle-products">
+        
+        <div class="tw-bundle-item">
+          <img src="{{ product.featured_image | image_url: width: 100 }}" width="50" height="50" alt="{{ product.title }}">
+          <div class="tw-bundle-info">
+            <span class="tw-bundle-name">This item: {{ product.title }}</span>
+            <span class="tw-bundle-price">{{ product.price | money }}</span>
+          </div>
+        </div>
+
+        <div class="tw-bundle-plus">+</div>
+
+        <div class="tw-bundle-item">
+          <img src="{{ bundled.featured_image | image_url: width: 100 }}" width="50" height="50" alt="{{ bundled.title }}">
+          <div class="tw-bundle-info">
+            <span class="tw-bundle-name">{{ bundled.title }}</span>
+            <span class="tw-bundle-price">{{ bundled.price | money }}</span>
+          </div>
+        </div>
+
+      </div>
+      
+      <button class="tw-bundle-btn" onclick="twAddBundle('{{ bundled.variants.first.id }}')">
+        Add Both to Cart
+      </button>
+    </div>
+
+    <style>
+      .tw-bundle-widget {
+        padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; margin: 20px 0; font-family: inherit;
+      }
+      .tw-bundle-title { margin-top: 0; font-size: 16px; font-weight: 600; margin-bottom: 15px; }
+      .tw-bundle-products { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+      .tw-bundle-item { display: flex; align-items: center; gap: 10px; flex: 1; }
+      .tw-bundle-item img { border-radius: 4px; object-fit: cover; }
+      .tw-bundle-info { display: flex; flex-direction: column; }
+      .tw-bundle-name { font-size: 13px; font-weight: 500; }
+      .tw-bundle-price { font-size: 13px; color: #666; }
+      .tw-bundle-plus { font-weight: bold; font-size: 18px; color: #999; }
+      .tw-bundle-btn {
+        width: 100%; padding: 12px; background: #000; color: #fff; border: none; border-radius: 4px;
+        font-weight: 600; cursor: pointer; transition: 0.2s;
+      }
+      .tw-bundle-btn:hover { background: #333; }
+    </style>
+
+    <script>
+      function twAddBundle(bundledVariantId) {
+        const mainVariantId = document.querySelector('[name="id"]')?.value;
+        if (!mainVariantId || !bundledVariantId) {
+          alert("Could not find product variants.");
+          return;
+        }
+
+        let formData = {
+          'items': [
+            { 'id': mainVariantId, 'quantity': 1 },
+            { 'id': bundledVariantId, 'quantity': 1 }
+          ]
+        };
+
+        const btn = document.querySelector('.tw-bundle-btn');
+        btn.innerText = "Adding...";
+        
+        fetch(window.Shopify.routes.root + 'cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        })
+        .then(response => {
+          window.location.href = '/cart';
+        })
+        .catch(err => {
+          console.error(err);
+          btn.innerText = "Error";
+        });
+      }
+    </script>
+  {% endif %}
+{% endif %}

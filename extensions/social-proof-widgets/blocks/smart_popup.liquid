@@ -1,0 +1,83 @@
+{% schema %}
+{
+  "name": "Exit Intent Popup",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Popup Title",
+      "default": "Wait! Don't leave yet..."
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Here is a 10% discount code just for you:"
+    },
+    {
+      "type": "text",
+      "id": "discount_code",
+      "label": "Discount Code",
+      "default": "SAVE10"
+    }
+  ]
+}
+{% endschema %}
+
+<div id="tw-exit-popup" class="tw-exit-modal" style="display: none;">
+  <div class="tw-exit-content">
+    <span class="tw-exit-close" onclick="document.getElementById('tw-exit-popup').style.display='none'">&times;</span>
+    <h2 class="tw-exit-title">{{ block.settings.title }}</h2>
+    <p class="tw-exit-subtitle">{{ block.settings.subtitle }}</p>
+    <div class="tw-exit-code">{{ block.settings.discount_code }}</div>
+    <button class="tw-exit-btn" onclick="twCopyCode('{{ block.settings.discount_code }}')">Copy & Apply Code</button>
+  </div>
+</div>
+
+<style>
+  .tw-exit-modal {
+    position: fixed; z-index: 99998; left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+    font-family: inherit;
+  }
+  .tw-exit-content {
+    background: #fff; width: 90%; max-width: 450px; border-radius: 8px; padding: 40px;
+    text-align: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  .tw-exit-close {
+    position: absolute; right: 15px; top: 10px; font-size: 28px; color: #999; cursor: pointer; z-index: 10;
+  }
+  .tw-exit-title { margin-top: 0; font-size: 24px; font-weight: 700; color: #000; }
+  .tw-exit-subtitle { font-size: 16px; color: #555; margin-bottom: 25px; }
+  .tw-exit-code {
+    display: inline-block; border: 2px dashed #000; padding: 15px 30px; font-size: 24px;
+    font-weight: 800; letter-spacing: 2px; color: #000; margin-bottom: 25px; background: #fafafa;
+  }
+  .tw-exit-btn {
+    width: 100%; padding: 15px; background: #000; color: #fff; border: none; border-radius: 4px;
+    font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.2s;
+  }
+  .tw-exit-btn:hover { background: #333; }
+</style>
+
+<script>
+  function twCopyCode(code) {
+    navigator.clipboard.writeText(code);
+    const btn = document.querySelector('.tw-exit-btn');
+    btn.innerText = "Copied!";
+    setTimeout(() => {
+      document.getElementById('tw-exit-popup').style.display = 'none';
+    }, 1500);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // Exit intent logic: trigger when mouse leaves the top of the viewport
+    document.addEventListener("mouseleave", (e) => {
+      if (e.clientY < 0 && !sessionStorage.getItem('tw_exit_seen')) {
+        document.getElementById('tw-exit-popup').style.display = 'flex';
+        sessionStorage.setItem('tw_exit_seen', 'true');
+      }
+    });
+  });
+</script>

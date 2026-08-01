@@ -1,0 +1,94 @@
+<div class="tw-review-pop" style="background-color: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }}; display: none;">
+  <div class="tw-review-content">
+    <div class="tw-stars">
+      {% for i in (1..5) %}
+        <svg fill="#FFD700" viewBox="0 0 20 20" width="16" height="16"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+      {% endfor %}
+    </div>
+    <p class="tw-review-title"><strong>Mükemmel Kalite!</strong></p>
+    <p class="tw-review-text">"Kumaşı çok güzel, herkese tavsiye ederim."</p>
+    <p class="tw-review-author">- Zeynep Y.</p>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Show the review pop-up after a slight delay to simulate a notification
+    setTimeout(() => {
+      const popEl = document.querySelector('.tw-review-pop');
+      if(popEl) {
+        popEl.style.display = 'flex';
+        popEl.classList.add('tw-slide-in');
+      }
+    }, 8000); // Shows 8 seconds after page load
+  });
+</script>
+
+<style>
+  .tw-review-pop {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 9999;
+    max-width: 300px;
+    font-family: inherit;
+    border-left: 4px solid #FFD700;
+  }
+  .tw-review-content p {
+    margin: 4px 0;
+    line-height: 1.3;
+  }
+  .tw-stars {
+    margin-bottom: 6px;
+  }
+  .tw-review-title {
+    font-size: 14px;
+  }
+  .tw-review-text {
+    font-size: 13px;
+    font-style: italic;
+    opacity: 0.9;
+  }
+  .tw-review-author {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-top: 8px;
+  }
+  .tw-slide-in {
+    animation: tw-slide-in-anim 0.5s ease-out forwards;
+  }
+  @keyframes tw-slide-in-anim {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Review Pop-up",
+  "target": "body",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
+  ]
+}
+{% endschema %}

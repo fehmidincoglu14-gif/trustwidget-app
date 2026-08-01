@@ -1,0 +1,65 @@
+{% schema %}
+{
+  "name": "Currency Converter",
+  "target": "section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#333333"
+    }
+  ]
+}
+{% endschema %}
+
+{% if shop.enabled_currencies.size > 1 %}
+<div class="tw-currency-converter" style="background: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }};">
+  {% form 'localization', id: 'tw-currency-form', class: 'tw-currency-form' %}
+    <label for="tw-currency-select" class="tw-currency-label">Currency:</label>
+    <select name="currency_code" id="tw-currency-select" class="tw-currency-select" onchange="this.form.submit()">
+      {% for currency in shop.enabled_currencies %}
+        <option value="{{ currency.iso_code }}" {% if currency.iso_code == cart.currency.iso_code %}selected{% endif %}>
+          {{ currency.iso_code }} ({{ currency.symbol }})
+        </option>
+      {% endfor %}
+    </select>
+  {% endform %}
+</div>
+
+<style>
+  .tw-currency-converter {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    font-family: inherit;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  .tw-currency-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+  }
+  .tw-currency-label {
+    font-weight: 500;
+  }
+  .tw-currency-select {
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    color: inherit;
+  }
+</style>
+{% endif %}

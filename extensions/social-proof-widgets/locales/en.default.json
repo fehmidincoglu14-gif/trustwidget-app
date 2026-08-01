@@ -1,0 +1,14 @@
+{
+  "widget": {
+    "live_visitor": {
+      "text": "people are viewing this product right now",
+      "prefix": "Currently"
+    },
+    "low_stock": {
+      "text": "Hurry! Only {count} items left in stock."
+    },
+    "recent_sales": {
+      "purchased": "purchased a"
+    }
+  }
+}

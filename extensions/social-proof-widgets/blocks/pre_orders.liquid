@@ -1,0 +1,44 @@
+{% schema %}
+{
+  "name": "Pre-Order Banner",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "message",
+      "label": "Pre-order Message",
+      "default": "This item is available for pre-order. Ships in 2-3 weeks."
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#fff3cd"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#856404"
+    }
+  ]
+}
+{% endschema %}
+
+{% if product.available %}
+  {% assign current_variant = product.selected_or_first_available_variant %}
+  {% if current_variant.inventory_management == 'shopify' and current_variant.inventory_policy == 'continue' and current_variant.inventory_quantity <= 0 %}
+    <div class="tw-preorder-banner" style="background: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }};">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      <span>{{ block.settings.message }}</span>
+    </div>
+
+    <style>
+      .tw-preorder-banner {
+        display: flex; align-items: center; padding: 12px 15px; border-radius: 6px;
+        font-family: inherit; font-size: 14px; font-weight: 500; margin: 15px 0;
+        border: 1px solid rgba(0,0,0,0.1);
+      }
+    </style>
+  {% endif %}
+{% endif %}

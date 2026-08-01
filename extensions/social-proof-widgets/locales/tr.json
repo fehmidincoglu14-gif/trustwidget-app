@@ -1,0 +1,14 @@
+{
+  "widget": {
+    "live_visitor": {
+      "text": "kişi şu an bu ürünü inceliyor",
+      "prefix": "Şu an"
+    },
+    "low_stock": {
+      "text": "Acele edin! Sadece {count} adet ürün kaldı."
+    },
+    "recent_sales": {
+      "purchased": "şunu satın aldı:"
+    }
+  }
+}

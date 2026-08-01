@@ -1,0 +1,14 @@
+{
+  "widget": {
+    "live_visitor": {
+      "text": "Personen sehen sich dieses Produkt gerade an",
+      "prefix": "Gerade"
+    },
+    "low_stock": {
+      "text": "Beeilung! Nur noch {count} Stück auf Lager."
+    },
+    "recent_sales": {
+      "purchased": "kaufte ein"
+    }
+  }
+}
