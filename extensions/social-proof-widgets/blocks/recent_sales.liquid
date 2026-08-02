@@ -1,4 +1,8 @@
-<div class="tw-recent-sales-widget" style="background-color: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }};">
+{% assign app_config = app.metafields.trustwidget.config.value %}
+{% assign widget_config = app_config["sales-pop"] %}
+
+{% if widget_config.isActive %}
+<div class="tw-recent-sales-widget" style="background-color: {{ widget_config.primaryColor | default: block.settings.bg_color }}; color: {{ block.settings.text_color }};">
   <div class="tw-content">
     {% if block.settings.show_image %}
       <div class="tw-product-img-fallback" style="width:50px;height:50px;background:#ddd;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:12px;">
@@ -6,12 +10,13 @@
       </div>
     {% endif %}
     <div class="tw-text-container">
-      <p class="tw-title"><strong>Ahmet</strong> from <strong>Istanbul</strong></p>
-      <p class="tw-subtitle">Just purchased a T-Shirt</p>
+      <p class="tw-title"><strong>Someone</strong> (<strong>New York</strong>)</p>
+      <p class="tw-subtitle" id="tw-rs-subtitle">just purchased: T-Shirt</p>
       <p class="tw-time">2 hours ago</p>
     </div>
   </div>
 </div>
+{% endif %}
 
 <style>
   .tw-recent-sales-widget {
@@ -85,8 +90,22 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // The prefix and subpath configured in shopify.app.toml
     const proxyUrl = '/apps/tw-api?action=recent-sales';
+    
+    // A/B Testing Logic
+    const isAbTest = {{ widget_config.isAbTestActive | default: false }};
+    let variant = 'A';
+    let textToUse = "{{ widget_config.customText | default: 'just purchased:' }}";
+    
+    if (isAbTest) {
+      variant = Math.random() < 0.5 ? 'A' : 'B';
+      textToUse = variant === 'A' 
+        ? "{{ widget_config.customTextA | default: 'just purchased:' }}" 
+        : "{{ widget_config.customTextB | default: 'just purchased:' }}";
+        
+      // Track View Event
+      fetch(`/apps/tw-api?action=track-ab&widgetId=sales-pop&variant=${variant}&eventType=view`, { method: 'POST' }).catch(() => {});
+    }
     
     fetch(proxyUrl)
       .then(res => res.json())
@@ -94,11 +113,11 @@
         if (result.success && result.data) {
           const titleEl = document.querySelector('.tw-recent-sales-widget .tw-title');
           const timeEl = document.querySelector('.tw-recent-sales-widget .tw-time');
-          const subEl = document.querySelector('.tw-recent-sales-widget .tw-subtitle');
+          const subEl = document.querySelector('#tw-rs-subtitle');
           
-          if (titleEl) titleEl.innerHTML = `<strong>${result.data.firstName}</strong> from <strong>${result.data.city}</strong>`;
+          if (titleEl) titleEl.innerHTML = `<strong>Someone</strong> (<strong>${result.data.city}</strong>)`;
           if (timeEl) timeEl.innerText = result.data.timeAgo;
-          if (subEl) subEl.innerText = `Just purchased a ${result.data.productName}`;
+          if (subEl) subEl.innerHTML = `${textToUse} <strong>${result.data.productName}</strong>`;
         }
       })
       .catch(err => console.error('TrustWidget: Error fetching recent sales data', err));

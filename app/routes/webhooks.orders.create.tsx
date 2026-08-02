@@ -12,27 +12,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   // The payload contains the order details
   const order = payload as any;
   
-  if (order.customer && order.shipping_address) {
-    const firstName = order.customer.first_name || "Bir müşteri";
+  if (order.shipping_address) {
     const city = order.shipping_address.city || "Bilinmeyen Şehir";
+    const country = order.shipping_address.country || "";
     const productName = order.line_items && order.line_items.length > 0 
       ? order.line_items[0].name 
       : "Bir ürün";
-    const productUrl = order.line_items && order.line_items.length > 0 && order.line_items[0].product_id
-      ? `/products/${order.line_items[0].product_id}` // To be improved
-      : "";
 
     // Save the anonymous recent order to the database
-    // We will define this schema in prisma later
     try {
       await db.recentOrder.create({
         data: {
           shop: shop,
-          firstName: firstName,
           city: city,
+          country: country,
           productName: productName,
-          productUrl: productUrl,
-          orderCreatedAt: new Date(order.created_at),
+          timestamp: new Date(order.created_at),
         },
       });
     } catch (error) {

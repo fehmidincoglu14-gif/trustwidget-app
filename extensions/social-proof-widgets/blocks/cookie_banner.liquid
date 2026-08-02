@@ -1,0 +1,143 @@
+{% schema %}
+{
+  "name": "Cookie Banner",
+  "target": "body",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text Color",
+      "default": "#ffffff"
+    }
+  ]
+}
+{% endschema %}
+
+{% assign app_config = app.metafields.trustwidget.config.value %}
+{% assign widget_config = app_config["cookie-banner"] %}
+
+{% if widget_config.isActive %}
+<div id="tw-cookie-banner" class="tw-cookie-banner" style="display: none; background-color: {{ widget_config.primaryColor | default: block.settings.bg_color }}; color: {{ block.settings.text_color }};">
+  <div class="tw-cookie-content">
+    <div class="tw-cookie-text">
+      <strong>{{ widget_config.customText | default: 'We value your privacy' }}</strong>
+      <p>We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.</p>
+    </div>
+    <div class="tw-cookie-buttons">
+      <button class="tw-btn-reject" onclick="twAcceptCookies()">Decline</button>
+      <button class="tw-btn-accept" style="background-color: {{ block.settings.button_bg }}; color: {{ block.settings.button_text_color }};" onclick="twAcceptCookies()">Accept All</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .tw-cookie-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    z-index: 999999;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    font-family: inherit;
+    border: 1px solid rgba(0,0,0,0.05);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .tw-cookie-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+  @media (max-width: 600px) {
+    .tw-cookie-content {
+      flex-direction: column;
+      text-align: center;
+    }
+    .tw-cookie-buttons {
+      width: 100%;
+      justify-content: stretch;
+    }
+    .tw-cookie-buttons button {
+      flex: 1;
+    }
+  }
+  .tw-cookie-text strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  .tw-cookie-text p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.8;
+    line-height: 1.5;
+  }
+  .tw-cookie-buttons {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .tw-cookie-buttons button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s;
+  }
+  .tw-btn-reject {
+    background: transparent;
+    color: inherit;
+    border: 1px solid currentColor !important;
+    opacity: 0.8;
+  }
+  .tw-btn-reject:hover {
+    opacity: 1;
+  }
+  .tw-btn-accept:hover {
+    opacity: 0.9;
+  }
+</style>
+
+<script>
+  function twAcceptCookies() {
+    localStorage.setItem('tw_cookies_accepted', 'true');
+    document.getElementById('tw-cookie-banner').style.display = 'none';
+    
+    // Attempt to integrate with Shopify Customer Privacy API if present
+    if (window.Shopify && window.Shopify.customerPrivacy) {
+      window.Shopify.customerPrivacy.setTrackingConsent(true, () => {
+        console.log("Tracking consent updated.");
+      });
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!localStorage.getItem('tw_cookies_accepted')) {
+      document.getElementById('tw-cookie-banner').style.display = 'block';
+    }
+  });
+</script>
+{% endif %}

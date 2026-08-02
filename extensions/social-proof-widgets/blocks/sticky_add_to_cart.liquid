@@ -19,8 +19,11 @@
 }
 {% endschema %}
 
-{% if product %}
-<div id="tw-sticky-cart" class="tw-sticky-cart" style="background: {{ block.settings.bg_color }}; display: none;">
+{% assign app_config = app.metafields.trustwidget.config.value %}
+{% assign widget_config = app_config["sticky-atc"] %}
+
+{% if product and widget_config.isActive %}
+<div id="tw-sticky-cart" class="tw-sticky-cart" style="background: {{ widget_config.primaryColor | default: block.settings.bg_color }}; display: none;">
   <div class="tw-sticky-container">
     <div class="tw-sticky-product">
       <img src="{{ product.featured_image | image_url: width: 50 }}" alt="{{ product.title }}">
@@ -31,7 +34,7 @@
     </div>
     <div class="tw-sticky-action">
       <button class="tw-sticky-btn" style="background: {{ block.settings.btn_color }};" onclick="twStickyAddToCart()">
-        Add to Cart
+        {{ widget_config.customText | default: 'Add to Cart' }}
       </button>
     </div>
   </div>

@@ -19,6 +19,10 @@
 }
 {% endschema %}
 
+{% assign app_config = app.metafields.trustwidget.config.value %}
+{% assign widget_config = app_config["spin-wheel"] %}
+
+{% if widget_config.isActive %}
 <div id="tw-wheel-modal" class="tw-wheel-modal" style="display: none;">
   <div class="tw-wheel-content">
     <span class="tw-wheel-close" onclick="document.getElementById('tw-wheel-modal').style.display='none'">&times;</span>
@@ -32,15 +36,15 @@
         </div>
       </div>
       <div class="tw-wheel-right">
-        <h2>{{ block.settings.title }}</h2>
+        <h2>{{ widget_config.customText | default: block.settings.title }}</h2>
         <p>{{ block.settings.subtitle }}</p>
         
         {% form 'customer', id: 'tw-wheel-form' %}
           <input type="hidden" name="contact[tags]" value="prospect, newsletter, wheel-of-fortune">
           <input type="email" name="contact[email]" required placeholder="Email Address" class="tw-wheel-input">
-          <button type="button" class="tw-wheel-btn" onclick="twSpinWheel()">Try Your Luck</button>
+          <button type="button" class="tw-wheel-btn" style="background: {{ widget_config.primaryColor | default: '#000' }};" onclick="twSpinWheel()">Spin to Win!</button>
           
-          <div id="tw-wheel-result" style="display:none; margin-top:15px; font-weight:bold; color:#d00000;">
+          <div id="tw-wheel-result" style="display:none; margin-top:15px; font-weight:bold; color:{{ widget_config.primaryColor | default: '#d00000' }};">
             You won 20% OFF! Use code: LUCKY20
           </div>
         {% endform %}
@@ -125,3 +129,4 @@
     }
   });
 </script>
+{% endif %}

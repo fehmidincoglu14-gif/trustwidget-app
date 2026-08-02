@@ -1,0 +1,131 @@
+{% schema %}
+{
+  "name": "Related Products",
+  "target": "section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "number",
+      "id": "limit",
+      "label": "Number of products to show",
+      "default": 4
+    }
+  ]
+}
+{% endschema %}
+
+{% assign app_config = app.metafields.trustwidget.config.value %}
+{% assign widget_config = app_config["related-products"] %}
+
+{% if widget_config.isActive %}
+<div class="tw-related-products" style="background-color: {{ widget_config.primaryColor | default: block.settings.bg_color }}; color: {{ block.settings.text_color }};">
+  <h2 class="tw-rp-title">{{ widget_config.customText | default: 'You May Also Like' }}</h2>
+  <div id="tw-rp-list-{{ block.id }}" class="tw-rp-list">
+    <p class="tw-rp-loading">Loading recommendations...</p>
+  </div>
+</div>
+
+<style>
+  .tw-related-products {
+    padding: 20px 0;
+    margin: 30px 0;
+    font-family: inherit;
+  }
+  .tw-rp-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .tw-rp-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  .tw-rp-item {
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s;
+  }
+  .tw-rp-item:hover {
+    transform: translateY(-5px);
+  }
+  .tw-rp-img-wrapper {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f9f9f9;
+    margin-bottom: 10px;
+  }
+  .tw-rp-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .tw-rp-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+  .tw-rp-price {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+  }
+  .tw-rp-loading {
+    text-align: center;
+    color: #888;
+    grid-column: 1 / -1;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const productId = "{{ product.id }}";
+    if (!productId) return;
+
+    const limit = {{ block.settings.limit }};
+    const listEl = document.getElementById('tw-rp-list-{{ block.id }}');
+
+    fetch(window.Shopify.routes.root + "recommendations/products.json?product_id=" + productId + "&limit=" + limit)
+      .then(response => response.json())
+      .then(({ products }) => {
+        if (products.length > 0) {
+          listEl.innerHTML = products.map(p => {
+            const price = (p.price / 100).toFixed(2);
+            // Formatter for currency, very basic fallback
+            return `
+              <a href="${p.url}" class="tw-rp-item">
+                <div class="tw-rp-img-wrapper">
+                  <img src="${p.featured_image}" class="tw-rp-img" alt="${p.title}" loading="lazy">
+                </div>
+                <div class="tw-rp-name">${p.title}</div>
+                <div class="tw-rp-price">${price}</div>
+              </a>
+            `;
+          }).join('');
+        } else {
+          listEl.innerHTML = "";
+          document.querySelector('.tw-related-products').style.display = 'none';
+        }
+      })
+      .catch(e => {
+        console.error(e);
+        listEl.innerHTML = "";
+      });
+  });
+</script>
+{% endif %}

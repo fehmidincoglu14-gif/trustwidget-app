@@ -1,0 +1,42 @@
+{% schema %}
+{
+  "name": "Inactive Tab Message",
+  "target": "body",
+  "settings": [
+    {
+      "type": "text",
+      "id": "message",
+      "label": "Tab Message",
+      "default": "Come back soon!"
+    },
+    {
+      "type": "text",
+      "id": "emoji",
+      "label": "Emoji",
+      "default": "👋"
+    }
+  ]
+}
+{% endschema %}
+
+{% assign app_config = app.metafields.trustwidget.config.value %}
+{% assign widget_config = app_config["inactive-tab"] %}
+
+{% if widget_config.isActive %}
+<script>
+  (function() {
+    let originalTitle = document.title;
+    let customMsg = "{{ widget_config.customText | default: block.settings.message }}";
+    let customEmoji = "{{ block.settings.emoji }}";
+    let inactiveTitle = customEmoji + " " + customMsg;
+
+    document.addEventListener("visibilitychange", function() {
+      if (document.hidden) {
+        document.title = inactiveTitle;
+      } else {
+        document.title = originalTitle;
+      }
+    });
+  })();
+</script>
+{% endif %}

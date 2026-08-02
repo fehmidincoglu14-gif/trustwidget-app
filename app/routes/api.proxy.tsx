@@ -17,21 +17,33 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (action === "recent-sales") {
     const recentOrder = await db.recentOrder.findFirst({
       where: { shop: shop },
-      orderBy: { orderCreatedAt: "desc" },
+      orderBy: { timestamp: "desc" },
     });
     
     if (recentOrder) {
       return json({
         success: true,
         data: {
-          firstName: recentOrder.firstName,
-          city: recentOrder.city,
+          city: recentOrder.city || "Bir müşteri",
           productName: recentOrder.productName,
-          timeAgo: Math.floor((Date.now() - recentOrder.orderCreatedAt.getTime()) / 60000) + " minutes ago"
+          timeAgo: Math.floor((Date.now() - recentOrder.timestamp.getTime()) / 60000) + " dakika önce"
         }
       });
     }
-    return json({ success: false, data: null });
+
+    // Smart Simulation Fallback (If no real orders exist yet)
+    const CITIES = ["İstanbul", "Ankara", "İzmir", "Bursa", "Antalya", "Adana"];
+    const randomCity = CITIES[Math.floor(Math.random() * CITIES.length)];
+    const timeAgo = Math.floor(Math.random() * 59) + 1; // 1 to 59 mins ago
+    
+    return json({ 
+      success: true, 
+      data: {
+        city: randomCity,
+        productName: "harika bir ürün", // This should ideally be pulled from active products
+        timeAgo: `${timeAgo} dakika önce`
+      } 
+    });
   }
 
   if (action === "live-visitor") {

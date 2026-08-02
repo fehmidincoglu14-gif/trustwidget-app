@@ -1,9 +1,13 @@
-<div class="tw-sticky-bar" style="background-color: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }};">
+{% assign app_config = app.metafields.trustwidget.config.value %}
+{% assign widget_config = app_config["announcement-bar"] %}
+
+{% if widget_config.isActive %}
+<div class="tw-sticky-bar" style="background-color: {{ widget_config.primaryColor | default: block.settings.bg_color }}; color: {{ block.settings.text_color }};">
   <div class="tw-sticky-content">
     {% if block.settings.icon != blank %}
       <span class="tw-sticky-icon">{{ block.settings.icon }}</span>
     {% endif %}
-    <span class="tw-sticky-text">{{ block.settings.announcement_text }}</span>
+    <span class="tw-sticky-text">{{ widget_config.customText | default: block.settings.announcement_text }}</span>
     {% if block.settings.button_text != blank %}
       <a href="{{ block.settings.button_link }}" class="tw-sticky-btn" style="background-color: {{ block.settings.button_bg }}; color: {{ block.settings.button_text_color }};">
         {{ block.settings.button_text }}
@@ -12,6 +16,7 @@
   </div>
   <button class="tw-sticky-close" onclick="this.parentElement.style.display='none'">&times;</button>
 </div>
+{% endif %}
 
 <style>
   .tw-sticky-bar {

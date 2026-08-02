@@ -73,3 +73,14 @@ model Review {
   isPublished Boolean  @default(true)
   createdAt   DateTime @default(now())
 }
+
+model WidgetConfig {
+  id        Int      @id @default(autoincrement())
+  shop      String
+  widgetId  String
+  isActive  Boolean  @default(false)
+  settings  String?  // JSON string
+  updatedAt DateTime @default(now())
+
+  @@unique([shop, widgetId])
+}

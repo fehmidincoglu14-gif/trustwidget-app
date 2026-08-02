@@ -19,8 +19,12 @@
 }
 {% endschema %}
 
-<div class="tw-volume-discount" style="background: {{ block.settings.bg_color }};">
-  <h3 class="tw-vd-title">{{ block.settings.title }}</h3>
+{% assign app_config = app.metafields.trustwidget.config.value %}
+{% assign widget_config = app_config["volume-discounts"] %}
+
+{% if widget_config.isActive %}
+<div class="tw-volume-discount" style="background: {{ widget_config.primaryColor | default: block.settings.bg_color }};">
+  <h3 class="tw-vd-title">{{ widget_config.customText | default: block.settings.title }}</h3>
   <div class="tw-vd-options">
     <div class="tw-vd-option" onclick="twAddMultiple(1)">
       <div class="tw-vd-radio"></div>
@@ -84,3 +88,4 @@
     });
   }
 </script>
+{% endif %}

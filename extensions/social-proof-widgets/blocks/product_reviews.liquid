@@ -25,9 +25,13 @@
 }
 {% endschema %}
 
-<div class="tw-product-reviews" style="background: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }};">
+{% assign app_config = app.metafields.trustwidget.config.value %}
+{% assign widget_config = app_config["product-reviews"] %}
+
+{% if widget_config.isActive %}
+<div class="tw-product-reviews" style="background: {{ widget_config.primaryColor | default: block.settings.bg_color }}; color: {{ block.settings.text_color }};">
   <div class="tw-pr-header">
-    <h2 class="tw-pr-title">Customer Reviews</h2>
+    <h2 class="tw-pr-title">{{ widget_config.customText | default: 'Customer Reviews' }}</h2>
     <button class="tw-pr-btn-write" onclick="document.getElementById('tw-pr-form-modal').style.display='block'">Write a Review</button>
   </div>
 
@@ -178,3 +182,4 @@
 
   document.addEventListener("DOMContentLoaded", loadTwReviews);
 </script>
+{% endif %}

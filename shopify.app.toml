@@ -1,37 +1,29 @@
-# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
-
 client_id = "7810a4ced6e55c404fe5a282f6d0b771"
-application_url = "https://shopify.dev/apps/default-app-home"
-embedded = true
+application_url = "https://van-tion-capitol-favorite.trycloudflare.com"
 name = "TrustWidget"
-
-[access_scopes]
-# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_orders,read_inventory,read_products"
-
-[webhooks]
-api_version = "2026-10"
-
-  [[webhooks.subscriptions]]
-  uri = "/webhooks/app/uninstalled"
-  topics = [ "app/uninstalled" ]
-
-  [[webhooks.subscriptions]]
-  uri = "/webhooks/app/scopes_update"
-  topics = [ "app/scopes_update" ]
-
-  [[webhooks.subscriptions]]
-  uri = "/webhooks/inventory_levels/update"
-  topics = [ "inventory_levels/update" ]
-
-[auth]
-redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
+embedded = true
 
 [build]
-include_config_on_deploy = true
 automatically_update_urls_on_dev = true
+dev_store_url = "sticky-cart-lcfrjjo0.myshopify.com"
+
+[access_scopes]
+scopes = "read_inventory,read_orders,read_products"
+
+[auth]
+redirect_urls = ["https://van-tion-capitol-favorite.trycloudflare.com/api/auth", "https://van-tion-capitol-favorite.trycloudflare.com/api/auth/callback"]
 
 [app_proxy]
-url = "https://shopify.dev/apps/default-app-home/api/proxy"
+url = "https://van-tion-capitol-favorite.trycloudflare.com/api/proxy"
 subpath = "tw-api"
 prefix = "apps"
+
+[webhooks]
+api_version = "2024-04"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks"
+
+[pos]
+embedded = false

@@ -1,0 +1,80 @@
+{% schema %}
+{
+  "name": "Animated Add to Cart",
+  "target": "body",
+  "settings": [
+    {
+      "type": "select",
+      "id": "animation_type",
+      "label": "Animation Type",
+      "options": [
+        { "value": "shake", "label": "Shake" },
+        { "value": "pulse", "label": "Pulse" },
+        { "value": "bounce", "label": "Bounce" }
+      ],
+      "default": "pulse"
+    },
+    {
+      "type": "number",
+      "id": "interval",
+      "label": "Animation Interval (seconds)",
+      "default": 5
+    }
+  ]
+}
+{% endschema %}
+
+{% assign app_config = app.metafields.trustwidget.config.value %}
+{% assign widget_config = app_config["animated-atc"] %}
+
+{% if widget_config.isActive %}
+<style>
+  @keyframes tw-shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+  }
+  @keyframes tw-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  @keyframes tw-bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+  }
+
+  .tw-animate-shake { animation: tw-shake 0.8s cubic-bezier(.36,.07,.19,.97) both; }
+  .tw-animate-pulse { animation: tw-pulse 1s infinite; }
+  .tw-animate-bounce { animation: tw-bounce 1s; }
+</style>
+
+<script>
+  (function() {
+    let animationClass = "tw-animate-{{ block.settings.animation_type }}";
+    let intervalSec = {{ block.settings.interval }} * 1000;
+    
+    function animateButton() {
+      // Find common add to cart buttons across different Shopify themes
+      let btns = document.querySelectorAll('button[name="add"], button.product-form__submit, form[action="/cart/add"] button[type="submit"]');
+      
+      btns.forEach(btn => {
+        btn.classList.remove("tw-animate-shake", "tw-animate-pulse", "tw-animate-bounce");
+        // trigger reflow
+        void btn.offsetWidth;
+        btn.classList.add(animationClass);
+        
+        // Remove animation after it finishes to allow it to run again
+        setTimeout(() => {
+          btn.classList.remove(animationClass);
+        }, 1500);
+      });
+    }
+
+    if(intervalSec > 0) {
+      setInterval(animateButton, intervalSec);
+    }
+  })();
+</script>
+{% endif %}

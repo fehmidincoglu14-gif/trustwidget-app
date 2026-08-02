@@ -1,0 +1,83 @@
+{% schema %}
+{
+  "name": "Scroll to Top",
+  "target": "body",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Button Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Position",
+      "options": [
+        { "value": "right", "label": "Bottom Right" },
+        { "value": "left", "label": "Bottom Left" }
+      ],
+      "default": "right"
+    }
+  ]
+}
+{% endschema %}
+
+{% assign app_config = app.metafields.trustwidget.config.value %}
+{% assign widget_config = app_config["scroll-to-top"] %}
+
+{% if widget_config.isActive %}
+<button id="tw-scroll-to-top" class="tw-scroll-to-top" title="Go to top" style="background-color: {{ widget_config.primaryColor | default: block.settings.bg_color }}; color: {{ block.settings.icon_color }}; {% if block.settings.position == 'left' %}left: 20px;{% else %}right: 20px;{% endif %}">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
+
+<style>
+  .tw-scroll-to-top {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    z-index: 99999;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: opacity 0.3s, transform 0.3s;
+    opacity: 0.8;
+  }
+  .tw-scroll-to-top:hover {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+</style>
+
+<script>
+  (function() {
+    let scrollBtn = document.getElementById("tw-scroll-to-top");
+
+    window.addEventListener("scroll", function() {
+      if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+        scrollBtn.style.display = "block";
+      } else {
+        scrollBtn.style.display = "none";
+      }
+    });
+
+    scrollBtn.addEventListener("click", function() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  })();
+</script>
+{% endif %}
